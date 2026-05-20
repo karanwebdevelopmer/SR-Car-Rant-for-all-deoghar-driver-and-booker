@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SR Car Rental — Driver Portal</title>
+    <link rel="stylesheet" href="style.css" />
+    <style>
+        .portal-wrap {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 1.75rem 1rem
+        }
+
+        .dashboard-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.75rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .driver-welcome {
+            display: flex;
+            align-items: center;
+            gap: .9rem
+        }
+
+        .driver-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--primary-color)
+        }
+
+        .otp-box {
+            background: rgba(59, 130, 246, .1);
+            border: 1px solid var(--primary-color);
+            border-radius: 12px;
+            padding: 1rem;
+            margin: 1rem 0;
+            text-align: center
+        }
+
+        .otp-code {
+            font-size: 2rem;
+            font-weight: 900;
+            letter-spacing: 8px;
+            color: var(--accent-color)
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- TOP BAR -->
+    <div class="top-bar">
+        <span class="t-brand">🚗 SR Car Rental</span>
+        <span style="color:var(--muted-text);font-size:.85rem">Driver Portal</span>
+        <a href="index.html" class="back-btn">← Home</a>
+    </div>
+
+    <!-- ===== AUTH SECTION ===== -->
+    <div id="auth-section">
+        <section class="hero" style="padding-bottom:1rem">
+            <div class="hero-eyebrow">Driver Portal</div>
+            <h1>Welcome, <span>Driver</span></h1>
+            <p>Register to join our fleet or login to manage your bookings.</p>
+        </section>
+
+        <div class="auth-container">
+            <div class="tab-switcher" id="auth-tabs">
+                <button class="active" onclick="switchAuthTab('login')">Login</button>
+                <button onclick="switchAuthTab('register')">Register</button>
+            </div>
+
+            <!-- LOGIN PANEL -->
+            <div id="login-panel" class="card-panel">
+                <div class="section-title">Driver Login</div>
+                <div class="form-group">
+                    <label>Mobile Number</label>
+                    <input class="form-control" id="login-mobile" placeholder="10-digit mobile" maxlength="10" />
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <div class="input-wrap">
+                        <input class="form-control" id="login-password" type="password" placeholder="Your password" />
+                        <button class="toggle-pw" type="button" onclick="togglePw('login-password',this)">👁</button>
+                    </div>
+                </div>
+                <button class="btn btn-primary btn-full" type="button" onclick="doLogin()">Login</button>
+                <div style="text-align:center;margin-top:1rem">
+                    <a href="#" onclick="showForgotPw();return false;" style="font-size:.82rem;color:var(--muted-text)">Forgot Password?</a>
+                </div>
+            </div>
+
+            <!-- FORGOT PASSWORD PANEL -->
+            <div id="forgot-panel" class="card-panel" style="display:none">
+                <div class="section-title">Reset Password</div>
+                <div id="forgot-step1">
+                    <div class="form-group">
+                        <label>Registered Mobile</label>
+                        <input class="form-control" id="forgot-mobile" placeholder="10-digit mobile" maxlength="10" />
+                    </div>
+                    <button class="btn btn-primary btn-full" type="button" onclick="sendOTP()">Send OTP</button>
+                    <div style="text-align:center;margin-top:1rem">
+                        <a href="#" onclick="showLogin();return false;" style="font-size:.82rem;color:var(--muted-text)">← Back to Login</a>
+                    </div>
+                </div>
+                <div id="forgot-step2" style="display:none">
+                    <div class="otp-box">
+                        <div style="font-size:.78rem;color:var(--muted-text);margin-bottom:.4rem">OTP sent to your mobile</div>
+                        <div class="otp-code" id="otp-display">------</div>
+                    </div>
+                    <div class="form-group">
+                        <label>Enter OTP</label>
+                        <input class="form-control" id="otp-input" maxlength="6" placeholder="6-digit OTP" />
+                    </div>
+                    <div class="form-group">
+                        <label>New Password</label>
+                        <input class="form-control" id="new-password" type="password" placeholder="Min 6 characters" />
+                    </div>
+                    <button class="btn btn-primary btn-full" type="button" onclick="resetPassword()">Reset Password</button>
+                </div>
+            </div>
+
+            <!-- REGISTER PANEL -->
+            <div id="register-panel" class="card-panel" style="display:none">
+                <div class="section-title">Driver Registration</div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Full Name *</label>
+                        <input class="form-control" id="r-name" placeholder="Your full name" />
+                    </div>
+                    <div class="form-group">
+                        <label>Mobile *</label>
+                        <input class="form-control" id="r-mobile" placeholder="10-digit number" maxlength="10" />
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Password *</label>
+                        <div class="input-wrap">
+                            <input class="form-control" id="r-password" type="password" placeholder="Min 6 chars" />
+                            <button class="toggle-pw" type="button" onclick="togglePw('r-password',this)">👁</button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Experience (years) *</label>
+                        <input class="form-control" id="r-exp" type="number" min="0" max="50" placeholder="0–50" />
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Car Model *</label>
+                        <input class="form-control" id="r-car" placeholder="e.g. Toyota Innova" />
+                    </div>
+                    <div class="form-group">
+                        <label>Car Capacity (seats) *</label>
+                        <input class="form-control" id="r-capacity" type="number" min="1" max="20" placeholder="1–20" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Car Details</label>
+                    <input class="form-control" id="r-cardetails" placeholder="Color, registration number, etc." />
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Driver Photo *</label>
+                        <input class="form-control" id="r-driver-img" type="file" accept="image/*" onchange="previewImg(this,'prev-driver')" />
+                        <img id="prev-driver" class="img-preview" alt="Driver preview" />
+                    </div>
+                    <div class="form-group">
+                        <label>Car Photo *</label>
+                        <input class="form-control" id="r-car-img" type="file" accept="image/*" onchange="previewImg(this,'prev-car')" />
+                        <img id="prev-car" class="img-preview" alt="Car preview" />
+                    </div>
+                </div>
+                <button class="btn btn-primary btn-full" type="button" onclick="doRegister()">Register as Driver</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== PENDING SCREEN ===== -->
+    <div id="pending-section" style="display:none" class="portal-wrap">
+        <div class="card-panel pending-screen">
+            <div class="icon">⏳</div>
+            <h2>Registration Under Review</h2>
+            <p>Your profile has been submitted. Please wait for admin approval before you can start accepting bookings.</p>
+            <button class="btn btn-secondary" style="margin-top:1.5rem" onclick="doLogout()">Logout</button>
+        </div>
+    </div>
+
+    <!-- ===== DASHBOARD ===== -->
+    <div id="dashboard-section" style="display:none" class="portal-wrap">
+        <div class="dashboard-header">
+            <div class="driver-welcome">
+                <img id="dash-avatar" class="driver-avatar" src="" alt="Driver" />
+                <div>
+                    <div style="font-weight:700;font-size:1.05rem" id="dash-name"></div>
+                    <div style="color:var(--muted-text);font-size:.82rem" id="dash-car"></div>
+                </div>
+            </div>
+            <button class="btn btn-secondary btn-sm" type="button" onclick="doLogout()">Logout</button>
+        </div>
+
+        <div class="stats-grid" id="dash-stats">
+            <div class="stat-card">
+                <div class="stat-label">Total Bookings</div>
+                <div class="stat-value" id="stat-total">0</div>
+            </div>
+            <div class="stat-card success">
+                <div class="stat-label">Confirmed</div>
+                <div class="stat-value" id="stat-confirmed">0</div>
+            </div>
+            <div class="stat-card accent">
+                <div class="stat-label">Pending</div>
+                <div class="stat-value" id="stat-pending">0</div>
+            </div>
+            <div class="stat-card danger">
+                <div class="stat-label">Cancelled</div>
+                <div class="stat-value" id="stat-cancelled">0</div>
+            </div>
+        </div>
+
+        <div class="card-panel">
+            <div class="section-title">My Bookings</div>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Customer</th>
+                            <th>Pickup</th>
+                            <th>Drop</th>
+                            <th>Type</th>
+                            <th>Date / Time</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="bookings-tbody"></tbody>
+                </table>
+            </div>
+            <div id="no-bookings" class="empty-state" style="display:none">
+                <div class="icon">📋</div>
+                <p>No bookings yet.</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="toast-container" class="toast-container"></div>
+
+        <script type="module">
+        (async () => {
+            try {
+                const mod = await import('./script.js');
+                const { showToast, generateOTP, saveDriver, checkMobileExists, checkCustomerMobileExists, updateDriver, updateBooking, listenDriverBookings, getAllDrivers } = mod;
+
+                let currentDriver = null;
+let currentDriverId = null;
+let generatedOTP = null;
+let forgotDriverId = null;
+
+// ===== HELPERS =====
+window.togglePw = (id, btn) => {
+  const el = document.getElementById(id);
+  el.type = el.type === 'password' ? 'text' : 'password';
+  btn.textContent = el.type === 'password' ? '👁' : '🙈';
+};
+
+window.previewImg = (input, previewId) => {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const img = document.getElementById(previewId);
+    img.src = e.target.result;
+    img.classList.add('show');
+  };
+  reader.readAsDataURL(file);
+};
+
+// ===== AUTH TABS =====
+window.switchAuthTab = (tab) => {
+  const tabs = document.querySelectorAll('#auth-tabs button');
+  tabs[0].classList.toggle('active', tab === 'login');
+  tabs[1].classList.toggle('active', tab === 'register');
+  document.getElementById('login-panel').style.display = tab === 'login' ? 'block' : 'none';
+  document.getElementById('register-panel').style.display = tab === 'register' ? 'block' : 'none';
+  document.getElementById('forgot-panel').style.display = 'none';
+};
+
+window.showForgotPw = () => {
+  document.getElementById('login-panel').style.display = 'none';
+  document.getElementById('forgot-panel').style.display = 'block';
+};
+
+window.showLogin = () => {
+  document.getElementById('forgot-panel').style.display = 'none';
+  document.getElementById('login-panel').style.display = 'block';
+};
+
+// ===== FORGOT PASSWORD =====
+window.sendOTP = async () => {
+    const mobile = document.getElementById('forgot-mobile').value.trim();
+    if (!/^\d{10}$/.test(mobile)) { showToast('Enter valid 10-digit mobile', 'error'); return; }
+    const drivers = await getAllDrivers();
+    const entry = Object.entries(drivers).find(([, d]) => d.mobile === mobile);
+    if (!entry) { showToast('Mobile not registered', 'error'); return; }
+    forgotDriverId = entry[0];
+    generatedOTP = generateOTP();
+    // Send OTP to server-side SMS endpoint. Do NOT display the OTP in UI for privacy.
+    try {
+        await fetch('/api/send-sms', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ mobile, message: `Your SR Car Rental OTP is ${generatedOTP}` })
+        });
+        document.getElementById('otp-display').textContent = 'Sent';
+        showToast('OTP sent to your mobile', 'info');
+    } catch (err) {
+        console.error('SMS send failed', err);
+        document.getElementById('otp-display').textContent = 'Failed';
+        showToast('Failed to send SMS. Contact support.', 'error');
+    }
+    document.getElementById('forgot-step1').style.display = 'none';
+    document.getElementById('forgot-step2').style.display = 'block';
+};
+
+window.resetPassword = async () => {
+  const otp = document.getElementById('otp-input').value.trim();
+  const newPw = document.getElementById('new-password').value.trim();
+  if (otp !== generatedOTP) { showToast('Invalid OTP', 'error'); return; }
+  if (newPw.length < 6) { showToast('Password must be at least 6 characters', 'error'); return; }
+  await updateDriver(forgotDriverId, { password: newPw });
+  showToast('Password reset successfully!', 'success');
+  document.getElementById('forgot-step2').style.display = 'none';
+  document.getElementById('forgot-step1').style.display = 'block';
+  showLogin();
+};
+
+// ===== LOGIN =====
+window.doLogin = async () => {
+  const mobile = document.getElementById('login-mobile').value.trim();
+  const password = document.getElementById('login-password').value.trim();
+  if (!mobile || !password) { showToast('Fill in all fields', 'error'); return; }
+  const drivers = await getAllDrivers();
+  const entry = Object.entries(drivers).find(([, d]) => d.mobile === mobile && d.password === password);
+  if (!entry) { showToast('Invalid credentials', 'error'); return; }
+  currentDriverId = entry[0];
+  currentDriver = entry[1];
+  showToast(`Welcome back, ${currentDriver.name}!`, 'success');
+  showDriverView();
+};
+
+// ===== REGISTER =====
+window.doRegister = async () => {
+  const name = document.getElementById('r-name').value.trim();
+  const mobile = document.getElementById('r-mobile').value.trim();
+  const password = document.getElementById('r-password').value.trim();
+  const exp = parseInt(document.getElementById('r-exp').value);
+  const car = document.getElementById('r-car').value.trim();
+  const capacity = parseInt(document.getElementById('r-capacity').value);
+  const carDetails = document.getElementById('r-cardetails').value.trim();
+  const driverImgFile = document.getElementById('r-driver-img').files[0];
+  const carImgFile = document.getElementById('r-car-img').files[0];
+
+  if (!name || !mobile || !password || !car) { showToast('Fill all required fields', 'error'); return; }
+  if (!/^\d{10}$/.test(mobile)) { showToast('Mobile must be 10 digits', 'error'); return; }
+  if (password.length < 6) { showToast('Password must be at least 6 characters', 'error'); return; }
+  if (isNaN(exp) || exp < 0 || exp > 50) { showToast('Experience must be 0–50 years', 'error'); return; }
+  if (isNaN(capacity) || capacity < 1 || capacity > 20) { showToast('Capacity must be 1–20', 'error'); return; }
+  if (!driverImgFile || !carImgFile) { showToast('Both driver and car photos are required', 'error'); return; }
+
+    const exists = await checkMobileExists(mobile);
+    const custExists = await checkCustomerMobileExists ? await checkCustomerMobileExists(mobile) : false;
+    if (exists || custExists) { showToast('Mobile already registered', 'error'); return; }
+
+  const toBase64 = file => new Promise(res => {
+    const r = new FileReader();
+    r.onload = e => res(e.target.result);
+    r.readAsDataURL(file);
+  });
+
+  const [driverImage, carImage] = await Promise.all([toBase64(driverImgFile), toBase64(carImgFile)]);
+  await saveDriver({ name, mobile, password, experience: exp, carModel: car, carCapacity: capacity, carDetails, driverImage, carImage, status: 'pending' });
+  showToast('Registration submitted! Awaiting admin approval.', 'success');
+  switchAuthTab('login');
+};
+
+// ===== SHOW DRIVER VIEW =====
+function showDriverView() {
+  document.getElementById('auth-section').style.display = 'none';
+  if (currentDriver.status === 'pending') {
+    document.getElementById('pending-section').style.display = 'block';
+  } else {
+    document.getElementById('dashboard-section').style.display = 'block';
+    loadDashboard();
+  }
+}
+
+// ===== DASHBOARD =====
+function loadDashboard() {
+  document.getElementById('dash-name').textContent = currentDriver.name;
+  document.getElementById('dash-car').textContent = `${currentDriver.carModel} · ${currentDriver.carCapacity} seats`;
+  document.getElementById('dash-avatar').src = currentDriver.driverImage || 'https://placehold.co/50?text=D';
+
+  listenDriverBookings(currentDriverId, bookings => {
+    const entries = Object.entries(bookings).sort((a, b) => (b[1].createdAt || 0) - (a[1].createdAt || 0));
+    const total = entries.length;
+    const confirmed = entries.filter(([, b]) => b.status === 'confirmed').length;
+    const pending = entries.filter(([, b]) => b.status === 'pending').length;
+    const cancelled = entries.filter(([, b]) => b.status === 'cancelled').length;
+
+    document.getElementById('stat-total').textContent = total;
+    document.getElementById('stat-confirmed').textContent = confirmed;
+    document.getElementById('stat-pending').textContent = pending;
+    document.getElementById('stat-cancelled').textContent = cancelled;
+
+    const tbody = document.getElementById('bookings-tbody');
+    const noBookings = document.getElementById('no-bookings');
+
+    if (!entries.length) {
+      tbody.innerHTML = '';
+      noBookings.style.display = 'block';
+      return;
+    }
+    noBookings.style.display = 'none';
+
+    tbody.innerHTML = entries.map(([id, b]) => `
+      <tr>
+        <td>
+          <strong>${escHtml(b.customerName)}</strong><br>
+          <small style="color:var(--muted-text)">${escHtml(b.customerMobile)}</small>
+        </td>
+        <td>${escHtml(b.pickupLocation)}</td>
+        <td>${escHtml(b.dropLocation)}</td>
+        <td><span class="badge badge-info">${b.bookingType}</span></td>
+        <td>${b.bookingDate || b.pickupTime || '—'}</td>
+        <td>${statusBadge(b.status)}</td>
+        <td>
+          ${b.status === 'pending' ? `
+            <button class="btn btn-success btn-sm" onclick="changeStatus('${id}','confirmed')">✓ Confirm</button>
+            <button class="btn btn-danger btn-sm" onclick="changeStatus('${id}','cancelled')" style="margin-top:4px">✕ Cancel</button>
+          ` : '—'}
+        </td>
+      </tr>
+    `).join('');
+  });
+}
+
+function escHtml(str) {
+  return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function statusBadge(s) {
+  const map = { confirmed: 'badge-success', pending: 'badge-warning', cancelled: 'badge-danger' };
+  return `<span class="badge ${map[s] || 'badge-info'}">${s}</span>`;
+}
+
+window.changeStatus = async (bookingId, status) => {
+  await updateBooking(bookingId, { status });
+  showToast(`Booking ${status}`, status === 'confirmed' ? 'success' : 'error');
+};
+
+window.doLogout = () => {
+    currentDriver = null;
+    currentDriverId = null;
+    document.getElementById('auth-section').style.display = 'block';
+    document.getElementById('pending-section').style.display = 'none';
+    document.getElementById('dashboard-section').style.display = 'none';
+    showToast('Logged out', 'info');
+};
+            } catch (e) {
+                console.error('Module load failed', e);
+                alert('Failed to load modules. Serve files over HTTP (py -m http.server 8000) and open http://localhost:8000');
+            }
+        })();
+        </script>
+</body>
+
+</html>
