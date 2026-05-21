@@ -1,0 +1,15 @@
+{
+  "rules": {
+    "drivers": {
+      ".indexOn": ["mobile"]
+    },
+    "customers": {
+      ".indexOn": ["mobile"]
+    },
+    "bookings": {
+      ".indexOn": ["driverId", "customerId", "status", "createdAt"]
+    },
+    ".read": true,
+    ".write": true
+  }
+}
